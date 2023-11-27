@@ -4,6 +4,7 @@ import {
   Controller,
   Post,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -14,6 +15,7 @@ import {
 import { UserDto } from './user.dto';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
