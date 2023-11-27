@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtModule } from '@nestjs/jwt';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -32,6 +33,9 @@ import { UserService } from './user/user.service';
       },
     ]),
     TypeOrmModule.forFeature([User]),
+    JwtModule.register({
+      secret: '10',
+    }),
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService],

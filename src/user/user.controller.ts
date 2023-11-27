@@ -1,45 +1,67 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
+import {
+  Body,
+  ConflictException,
+  Controller,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { UserDto } from './user.dto';
 import { UserService } from './user.service';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  @Post()
+  @Post('signup')
   @ApiCreatedResponse({
     status: 201,
     description: 'The user has been successfully created.',
   })
   @ApiResponse({
-    status: 400,
+    status: 409,
     description: 'Username already exists.',
-    type: CreateUserDto,
+    type: UserDto,
   })
-  // @ApiBody({
-  //   description: 'User data to create a new user',
-  //   type: CreateUserDto,
-  //   examples: {
-  //     'application/json': {
-  //       username: 'john_doe',
-  //       password: 'password123',
-  //     },
-  //   },
-  // })
-  async create(@Body() createUserDto: CreateUserDto) {
+  @ApiBody({ type: UserDto })
+  async create(@Body() userInfo: UserDto) {
     const existingUser = await this.userService.findByUsername(
-      createUserDto.username,
+      userInfo.username,
     );
 
     if (existingUser) {
-      throw new Error('Username already exists');
+      throw new ConflictException('Username already exists');
     }
 
-    return this.userService.createUser(
-      createUserDto.username,
-      createUserDto.password,
+    return this.userService.createUser(userInfo.username, userInfo.password);
+  }
+
+  @Post('signin')
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBody({ type: UserDto })
+  async login(@Body() userInfo: UserDto) {
+    const user = await this.userService.validateUser(
+      userInfo.username,
+      userInfo.password,
     );
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = { username: user.username, sub: user.id };
+    const token = this.jwtService.sign(payload);
+
+    return { token };
   }
 }
