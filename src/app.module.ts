@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 import { User } from './user/user.entity';
 import { UserController } from './user/user.controller';
@@ -12,6 +12,8 @@ import { MovieService } from './movie/movie.service';
 import { MovieController } from './movie/movie.controller';
 import { Movie } from './movie/movie.entity';
 import { Genre } from './movie/genre.entity';
+import { RedisConfigService } from './redis/redis-config.service';
+import { RedisUseService } from './redis/redis.service';
 
 @Module({
   imports: [
@@ -25,23 +27,22 @@ import { Genre } from './movie/genre.entity';
       logging: true,
       entities: ['dist/**/*.entity{.ts,.js}'],
     }),
-    ClientsModule.register([
-      {
-        name: 'REDIS_CLIENT',
-        transport: Transport.REDIS,
-        options: {
-          host: process.env.REDIS_HOST || 'localhost',
-          port: +process.env.REDIS_PORT || 6379,
-        },
-      },
-    ]),
     TypeOrmModule.forFeature([User, Movie, Genre]),
     JwtModule.register({
       secret: process.env.JWT_SECRET || '10',
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    RedisModule.forRootAsync({
+      useClass: RedisConfigService,
+    }),
   ],
   controllers: [UserController, MovieController],
-  providers: [UserService, MovieService, JwtStrategy],
+  providers: [
+    UserService,
+    MovieService,
+    RedisConfigService,
+    RedisUseService,
+    JwtStrategy,
+  ],
 })
 export class AppModule {}
