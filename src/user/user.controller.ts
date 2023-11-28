@@ -1,10 +1,4 @@
-import {
-  Body,
-  ConflictException,
-  Controller,
-  Post,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import {
   ApiBody,
   ApiCreatedResponse,
@@ -35,32 +29,17 @@ export class UserController {
   })
   @ApiBody({ type: UserDto })
   async create(@Body() userInfo: UserDto) {
-    const existingUser = await this.userService.findByUsername(
-      userInfo.username,
-    );
-
-    if (existingUser) {
-      throw new ConflictException('Username already exists');
-    }
-
     return this.userService.createUser(userInfo.username, userInfo.password);
   }
 
   @Post('signin')
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: UserDto })
-  async login(@Body() userInfo: UserDto) {
-    const user = await this.userService.validateUser(
+  async login(@Body() userInfo: UserDto): Promise<{ token: string }> {
+    const token = await this.userService.validateUser(
       userInfo.username,
       userInfo.password,
     );
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const payload = { username: user.username, sub: user.id };
-    const token = this.jwtService.sign(payload);
 
     return { token };
   }

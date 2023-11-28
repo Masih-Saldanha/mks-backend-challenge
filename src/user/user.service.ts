@@ -1,5 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
@@ -9,9 +14,16 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createUser(username: string, password: string): Promise<User> {
+    const existingUser = await this.findByUsername(username);
+
+    if (existingUser) {
+      throw new ConflictException('Username already exists');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = this.userRepository.create({
       username,
@@ -24,13 +36,17 @@ export class UserService {
     return this.userRepository.findOne({ where: { username } });
   }
 
-  async validateUser(username: string, password: string): Promise<User | null> {
+  async validateUser(
+    username: string,
+    password: string,
+  ): Promise<string | null> {
     const user = await this.findByUsername(username);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+      const payload = { username: user.username, sub: user.id };
+      return this.jwtService.sign(payload);
     }
 
-    return null;
+    throw new UnauthorizedException('Invalid credentials');
   }
 }
