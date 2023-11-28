@@ -16,6 +16,7 @@ async function bootstrap() {
     .setDescription('Desafio Back-end')
     .setVersion('1.0')
     .addTag('nestjs')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
