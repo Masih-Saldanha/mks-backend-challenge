@@ -17,11 +17,9 @@ import { Genre } from './movie/genre.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: +process.env.DB_PORT || 5432,
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_DATABASE || 'mks_db',
+      url:
+        process.env.DB_URL ||
+        'postgresql://postgres:postgres@localhost:5432/mks_db?schema=public',
       synchronize: true,
       logging: true,
       entities: ['dist/**/*.entity{.ts,.js}'],
