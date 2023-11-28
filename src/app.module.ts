@@ -4,8 +4,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { User } from './user/user.entity';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
@@ -19,11 +17,11 @@ import { Genre } from './movie/genre.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'mks_db',
+      host: process.env.DB_HOST || 'localhost',
+      port: +process.env.DB_PORT || 5432,
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_DATABASE || 'mks_db',
       synchronize: true,
       logging: true,
       entities: ['dist/**/*.entity{.ts,.js}'],
@@ -33,18 +31,18 @@ import { Genre } from './movie/genre.entity';
         name: 'REDIS_CLIENT',
         transport: Transport.REDIS,
         options: {
-          host: 'localhost',
-          port: 6379,
+          host: process.env.REDIS_HOST || 'localhost',
+          port: +process.env.REDIS_PORT || 6379,
         },
       },
     ]),
     TypeOrmModule.forFeature([User, Movie, Genre]),
     JwtModule.register({
-      secret: '10',
+      secret: process.env.JWT_SECRET || '10',
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  controllers: [AppController, UserController, MovieController],
-  providers: [AppService, UserService, MovieService, JwtStrategy],
+  controllers: [UserController, MovieController],
+  providers: [UserService, MovieService, JwtStrategy],
 })
 export class AppModule {}

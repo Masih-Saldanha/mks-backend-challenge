@@ -29,7 +29,9 @@ export class UserService {
       username,
       password: hashedPassword,
     });
-    return await this.userRepository.save(user);
+    const data = await this.userRepository.save(user);
+    data.password = '';
+    return data;
   }
 
   async findByUsername(username: string): Promise<User | undefined> {
@@ -44,7 +46,9 @@ export class UserService {
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload = { username: user.username, sub: user.id };
-      return this.jwtService.sign(payload);
+      const token = this.jwtService.sign(payload);
+
+      return token;
     }
 
     throw new UnauthorizedException('Invalid credentials');
