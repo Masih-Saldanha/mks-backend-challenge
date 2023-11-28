@@ -10,6 +10,10 @@ import { User } from './user/user.entity';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { MovieService } from './movie/movie.service';
+import { MovieController } from './movie/movie.controller';
+import { Movie } from './movie/movie.entity';
+import { Genre } from './movie/genre.entity';
 
 @Module({
   imports: [
@@ -34,13 +38,13 @@ import { JwtStrategy } from './auth/jwt.strategy';
         },
       },
     ]),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Movie, Genre]),
     JwtModule.register({
       secret: '10',
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService, JwtStrategy],
+  controllers: [AppController, UserController, MovieController],
+  providers: [AppService, UserService, MovieService, JwtStrategy],
 })
 export class AppModule {}
