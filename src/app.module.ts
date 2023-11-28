@@ -17,6 +17,7 @@ import { Genre } from './movie/genre.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
+      ssl: true,
       url:
         process.env.DB_URL ||
         'postgresql://postgres:postgres@localhost:5432/mks_db?schema=public',
