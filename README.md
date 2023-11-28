@@ -1,3 +1,33 @@
+# MKS Backend Challenge
+
+Projeto desenvolvido em menos de 72h com NestJS que simula o funcionamento de um catálogo de filmes com o usuário autenticado podendo registrar, ver, editar e deletar filmes no banco de dados.
+
+A aplicação conta com swagger para testes.
+
+## Deploy
+
+https://mks-backend-challenge-masih.onrender.com/api
+
+## Tecnologias Conhecidas
+
+- **TypeScript**: 2 anos
+- **Nest.js**: Menos de 1 ano
+- **TypeORM**: Menos de 1 ano
+- **Swagger**: Menos de 1 ano
+- **Docker**: 2 anos
+- **Redis**: 2 anos
+- **PostgreSQL**: 2 anos
+- **bcrypt**: 2 anos
+- **dotenv**: 2 anos
+
+## Tempo de Experiência
+
+- **Desenvolvimento**: 2 anos
+- **Banco de Dados PostgreSQL e Redis**: 2 anos
+- **Docker**: 2 anos
+
+# NestJS Template
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
